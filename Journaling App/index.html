@@ -26,7 +26,7 @@
             }
         }
     </script>
-    <style>
+  <style>
     body { 
         /* Ein warmer, cremiger Papier-Ton */
         background-color: #F9F7F2; 
@@ -53,12 +53,16 @@
         box-shadow: 6px 6px 0px #D1C9BC;
     }
 
-    /* Der Schreibbereich im Fokus-Modus */
-    textarea {
-        background: transparent !important;
-        line-height: 2.5rem !important;
-        border: none !important;
-        resize: none;
+    /* Optimierung für mobile Geräte (Smartphone-Ansicht) */
+    @media (max-width: 640px) {
+        #focus-area .grid {
+            gap: 1.5rem; /* Kompakterer Abstand auf dem Handy */
+        }
+        
+        #focus-title {
+            font-size: 1.5rem; /* Schriftgröße der Frage am Handy leicht reduzieren */
+            line-height: 1.4;
+        }
     }
 </style>
 </head>
