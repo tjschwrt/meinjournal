@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journaling Begleiter: Fokus-Modus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Merriweather', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        paper: '#F9F7F2', // Wechsel zu "Altes Pergament"
+                        ink: '#2C3539',
+                        accent: '#8B9A84',
+                        accentLight: '#D9E0D4',
+                        warmBorder: '#E8E3D9',
+                        focusBg: '#F4F7F2'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+    body { 
+        /* Ein warmer, cremiger Papier-Ton */
+        background-color: #F9F7F2; 
+        scroll-behavior: smooth; 
+    }
+
+    /* Der Header bleibt fixiert, aber leicht transparent */
+    .glass-panel { 
+        background: #F9F7F2; 
+        backdrop-filter: blur(10px); 
+        border-bottom: 2px solid #D1C9BC; 
+    }
+
+    /* Die Karten bekommen einen leichten Schatten, als lägen sie auf dem Tisch */
+    .prompt-card {
+        background-color: #FCFAFA;
+        border: 1px solid #D1C9BC;
+        box-shadow: 3px 3px 0px #D1C9BC; /* "Harter" Schatten für Retro-Look */
+        transition: all 0.2s ease;
+    }
+
+    .prompt-card:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px #D1C9BC;
+    }
+
+    /* Der Schreibbereich im Fokus-Modus */
+    textarea {
+        background: transparent !important;
+        line-height: 2.5rem !important;
+        border: none !important;
+        resize: none;
+    }
+</style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+    <header class="sticky top-0 z-50 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🌱</span>
+                <h1 class="text-xl font-serif font-bold text-ink">Journaling Fokus</h1>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="#session" class="hover:text-accent">Aktuelle Session</a>
+                <a href="#pool" class="hover:text-accent">Bibliothek</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-12 space-y-16">
+        
+        <section id="session" class="space-y-12">
+            <div class="text-center space-y-4">
+                <h2 class="text-4xl font-serif font-bold">Wähle deinen Anker</h2>
+                <p class="text-gray-600 max-w-xl mx-auto">Qualität vor Quantität. Wähle eine Frage für den Deep-Dive aus.</p>
+                <button id="btn-draw" class="mt-4 px-8 py-3 bg-ink text-white rounded-full hover:bg-accent transition-all shadow-md font-medium">
+                    🎲 3 Neue Impulse ziehen
+                </button>
+            </div>
+
+            <div id="triple-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-500">
+                </div>
+
+            <div id="focus-area" class="hidden fade-in max-w-4xl mx-auto bg-white rounded-3xl border border-accent shadow-xl overflow-hidden">
+                <div class="bg-accent p-6 text-white flex justify-between items-center">
+                    <span class="text-sm font-bold tracking-widest uppercase">Deep Dive Modus</span>
+                    <button onclick="resetFocus()" class="text-white/80 hover:text-white text-sm">Abbrechen</button>
+                </div>
+                <div class="p-8 md:p-12 space-y-10">
+                    <div class="space-y-4">
+                        <span id="focus-id" class="text-xs font-mono text-accent"></span>
+                        <h3 id="focus-title" class="text-3xl font-serif italic text-ink"></h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <textarea id="journal-entry" rows="6" class="w-full p-4 bg-paper border border-warmBorder rounded-xl focus:ring-2 focus:ring-accent focus:outline-none font-serif text-lg" placeholder="Deine Gedanken hier..."></textarea>
+                        <button onclick="alert('Gespeichert! (Simulation)')" class="px-6 py-2 bg-accent text-white rounded-full hover:bg-ink transition-all">Eintrag speichern</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-warmBorder pt-10">
+                        <div class="space-y-3">
+                            <h4 class="font-bold flex items-center gap-2"><span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 5-Warum</h4>
+                            <p class="text-sm text-gray-600 italic">Frage dich 5x "Warum?".</p>
+                        </div>
+                        <div class="space-y-3">
+                            <h4 class="font-bold flex items-center gap-2"><span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> Somatik</h4>
+                            <p class="text-sm text-gray-600 italic">Wo im Körper spürst du das?</p>
+                        </div>
+                        <div class="space-y-3">
+                            <h4 class="font-bold flex items-center gap-2"><span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> Aktion</h4>
+                            <p class="text-sm text-gray-600 italic">Was ist der winzigste nächste Schritt?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-warmBorder">
+
+        <section id="pool" class="space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-2xl font-serif font-bold">Alle <span id="prompt-count">0</span> Prompts</h2>
+                <div id="cat-filters" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div id="library-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+    </main>
+
+    <script>
+        let prompts = []; 
+        let selectedFocus = null;
+        let activeFilter = 'Alle';
+
+        async function loadPrompts() {
+            try {
+                const response = await fetch('prompts.json');
+                prompts = await response.json();
+                
+                renderFilters(); 
+                renderLibrary();
+                drawThree();
+                
+                document.getElementById('prompt-count').textContent = prompts.length;
+            } catch (error) {
+                console.error("Fehler beim Laden:", error);
+                // Falls die Datei lokal nicht geladen werden kann (CORS), 
+                // wird hier eine Fehlermeldung angezeigt.
+            }
+        }
+
+        function shuffle(array) { return [...array].sort(() => Math.random() - 0.5); }
+
+        function setFocus(p) {
+            selectedFocus = p;
+            const focusArea = document.getElementById('focus-area');
+            document.getElementById('focus-id').textContent = p.id;
+            document.getElementById('focus-title').textContent = `"${p.text}"`;
+            focusArea.classList.remove('hidden');
+            
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                card.classList.toggle('focus-active', card.dataset.id === p.id);
+                card.classList.toggle('secondary-card', card.dataset.id !== p.id);
+            });
+
+            window.scrollTo({ top: focusArea.offsetTop - 120, behavior: 'smooth' });
+        }
+
+        function resetFocus() {
+            selectedFocus = null;
+            document.getElementById('focus-area').classList.add('hidden');
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                card.classList.remove('focus-active', 'secondary-card');
+            });
+        }
+
+        function drawThree() {
+            resetFocus();
+            const container = document.getElementById('triple-container');
+            container.innerHTML = '';
+            const selection = shuffle(prompts).slice(0, 3);
+            
+            selection.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
+                card.dataset.id = p.id;
+                card.style.animationDelay = `${i * 150}ms`;
+                card.onclick = () => setFocus(p);
+                card.innerHTML = `
+                    <div class="w-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-mono text-gray-400">${p.id}</span>
+                            <span class="text-[10px] font-bold text-accent uppercase tracking-widest">${p.cat}</span>
+                        </div>
+                        <p class="text-lg font-serif text-ink leading-snug">"${p.text}"</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('library-grid');
+            grid.innerHTML = '';
+            const filtered = activeFilter === 'Alle' ? prompts : prompts.filter(p => p.cat === activeFilter);
+            filtered.forEach(p => {
+                const item = document.createElement('div');
+                item.className = "bg-white p-5 rounded-xl border border-warmBorder hover:border-accent cursor-pointer transition-all";
+                item.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); setFocus(p); };
+                item.innerHTML = `
+                    <div class="flex justify-between mb-2"><span class="text-[9px] font-mono">${p.id}</span><span class="text-[9px] uppercase text-accent font-bold">${p.cat}</span></div>
+                    <p class="text-sm font-serif italic text-ink">"${p.text}"</p>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+function renderFilters() {
+            const bar = document.getElementById('cat-filters');
+            
+            // 1. Einzigartige Kategorien holen (alphabetisch sortiert)
+            const uniqueCats = [...new Set(prompts.map(p => p.cat))].sort((a, b) => a.localeCompare('de'));
+            
+            // 2. "Alle" explizit an den Anfang setzen
+            const cats = ['Alle', ...uniqueCats];
+
+            bar.innerHTML = '';
+            cats.forEach(c => {
+                const btn = document.createElement('button');
+                btn.textContent = c;
+                btn.className = `px-3 py-1 rounded-full text-[10px] border transition-all ${activeFilter === c ? 'bg-ink text-white' : 'bg-white text-gray-400 border-warmBorder hover:border-accent'}`;
+                btn.onclick = () => { 
+                    activeFilter = c; 
+                    renderFilters(); 
+                    renderLibrary(); 
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        // Event Listener und Initialisierung
+        document.getElementById('btn-draw').onclick = drawThree;
+        
+        // Startet die App
+        loadPrompts();
+    </script>
+</body>
+</html>
