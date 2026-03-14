@@ -118,7 +118,7 @@
         </section>
     </main>
 
-    <script>
+<script>
         let prompts = []; 
         let categoryTips = {}; 
         let selectedFocus = null;
@@ -148,9 +148,12 @@
             const focusArea = document.getElementById('focus-area');
             document.getElementById('focus-id').textContent = p.id;
             document.getElementById('focus-title').textContent = `"${p.text}"`;
+            
             const tipTitleEl = document.getElementById('tip-3-title');
             const tipTextEl = document.getElementById('tip-3-text');
+            
             const fullTip = categoryTips[p.cat] || categoryTips["default"];
+            
             if (fullTip && fullTip.includes(':')) {
                 const [title, desc] = fullTip.split(':');
                 tipTitleEl.textContent = title.trim();
@@ -159,8 +162,9 @@
                 tipTitleEl.textContent = "Aktion";
                 tipTextEl.textContent = fullTip || "Was ist der winzigste nächste Schritt?";
             }
+            
             focusArea.classList.remove('hidden');
-            window.scrollTo({ top: focusArea.offsetTop - 100, behavior: 'smooth' });
+            // Der automatische Scroll-Befehl wurde hier entfernt
         }
 
         function resetFocus() {
