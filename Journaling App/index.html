@@ -15,7 +15,7 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        paper: '#F9F7F2', // "Altes Pergament"
+                        paper: '#F9F7F2',
                         ink: '#2C3539',
                         accent: '#8B9A84',
                         accentLight: '#D9E0D4',
@@ -26,45 +26,16 @@
             }
         }
     </script>
-  <style>
-    body { 
-        /* Ein warmer, cremiger Papier-Ton */
-        background-color: #F9F7F2; 
-        scroll-behavior: smooth; 
-    }
-
-    /* Der Header bleibt fixiert, aber leicht transparent */
-    .glass-panel { 
-        background: #F9F7F2; 
-        backdrop-filter: blur(10px); 
-        border-bottom: 2px solid #D1C9BC; 
-    }
-
-    /* Die Karten bekommen einen leichten Schatten, als lägen sie auf dem Tisch */
-    .prompt-card {
-        background-color: #FCFAFA;
-        border: 1px solid #D1C9BC;
-        box-shadow: 3px 3px 0px #D1C9BC; /* "Harter" Schatten für Retro-Look */
-        transition: all 0.2s ease;
-    }
-
-    .prompt-card:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px #D1C9BC;
-    }
-
-    /* Optimierung für mobile Geräte (Smartphone-Ansicht) */
-    @media (max-width: 640px) {
-        #focus-area .grid {
-            gap: 1.5rem; /* Kompakterer Abstand auf dem Handy */
+    <style>
+        body { background-color: #F9F7F2; scroll-behavior: smooth; }
+        .glass-panel { background: #F9F7F2; backdrop-filter: blur(10px); border-bottom: 2px solid #D1C9BC; }
+        .prompt-card { background-color: #FCFAFA; border: 1px solid #D1C9BC; box-shadow: 3px 3px 0px #D1C9BC; transition: all 0.2s ease; }
+        .prompt-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #D1C9BC; }
+        @media (max-width: 640px) {
+            #focus-area .grid { gap: 1.5rem; }
+            #focus-title { font-size: 1.5rem; line-height: 1.4; }
         }
-        
-        #focus-title {
-            font-size: 1.5rem; /* Schriftgröße der Frage am Handy leicht reduzieren */
-            line-height: 1.4;
-        }
-    }
-</style>
+    </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">
 
@@ -92,8 +63,7 @@
                 </button>
             </div>
 
-            <div id="triple-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-500">
-                </div>
+            <div id="triple-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-500"></div>
 
             <div id="focus-area" class="hidden fade-in max-w-4xl mx-auto bg-white rounded-3xl border border-accent shadow-xl overflow-hidden">
                 <div class="bg-accent p-6 text-white flex justify-between items-center">
@@ -111,17 +81,22 @@
                             <h4 class="font-bold flex items-center gap-2"><span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 5-Warum</h4>
                             <p class="text-sm text-gray-600 italic">Frage dich 5x "Warum?".</p>
                         </div>
-                       <div class="space-y-3">
-    <h4 class="font-bold flex items-center gap-2">
-        <span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
-        <span id="tip-3-title">Aktion</span>
-    </h4>
-    <p id="tip-3-text" class="text-sm text-gray-600 italic">Was ist der winzigste nächste Schritt?</p>
-    
-    <button onclick="applyJoker()" class="text-[10px] text-accent hover:text-ink border border-accent/30 hover:border-accent px-2 py-1 rounded mt-2 transition-all">
-        🔄 Anderer Impuls
-    </button>
-</div>
+                        
+                        <div class="space-y-3">
+                            <h4 class="font-bold flex items-center gap-2"><span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> Somatik</h4>
+                            <p class="text-sm text-gray-600 italic">Wo im Körper spürst du das?</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="font-bold flex items-center gap-2">
+                                <span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
+                                <span id="tip-3-title">Aktion</span>
+                            </h4>
+                            <p id="tip-3-text" class="text-sm text-gray-600 italic">Was ist der winzigste nächste Schritt?</p>
+                            <button onclick="applyJoker()" class="text-[10px] text-accent hover:text-ink border border-accent/30 hover:border-accent px-2 py-1 rounded mt-2 transition-all">
+                                🔄 Anderer Impuls
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -138,151 +113,133 @@
         </section>
     </main>
 
-  <script>
-    let prompts = []; 
-    let categoryTips = {}; // NEU: Speicher für die Tipps aus der JSON
-    let selectedFocus = null;
-    let activeFilter = 'Alle';
+    <script>
+        let prompts = []; 
+        let categoryTips = {}; 
+        let selectedFocus = null;
+        let activeFilter = 'Alle';
 
-    async function loadPrompts() {
-        try {
-            // NEU: Lädt beide Dateien gleichzeitig
-            const [promptsRes, tipsRes] = await Promise.all([
-                fetch('prompts.json'),
-                fetch('tips.json')
-            ]);
-            
-            prompts = await promptsRes.json();
-            categoryTips = await tipsRes.json();
-            
-            renderFilters(); 
-            renderLibrary();
-            drawThree();
-            
-            document.getElementById('prompt-count').textContent = prompts.length;
-        } catch (error) {
-            console.error("Fehler beim Laden:", error);
-        }
-    }
-
-    function shuffle(array) { return [...array].sort(() => Math.random() - 0.5); }
-
-    function setFocus(p) {
-        selectedFocus = p;
-        const focusArea = document.getElementById('focus-area');
-        document.getElementById('focus-id').textContent = p.id;
-        document.getElementById('focus-title').textContent = `"${p.text}"`;
-
-        // NEU: Dynamischer Tipp für Punkt 3
-        const tipTitleEl = document.getElementById('tip-3-title');
-        const tipTextEl = document.getElementById('tip-3-text');
-        
-        // Holt den Tipp aus der JSON basierend auf p.cat
-        const fullTip = categoryTips[p.cat] || categoryTips["default"];
-        
-        // Trennung von "Titel: Beschreibung"
-        if (fullTip.includes(':')) {
-            const [title, desc] = fullTip.split(':');
-            tipTitleEl.textContent = title.trim();
-            tipTextEl.textContent = desc.trim();
-        } else {
-            tipTitleEl.textContent = "Aktion";
-            tipTextEl.textContent = fullTip;
-        }
-
-        focusArea.classList.remove('hidden');
-        
-        document.querySelectorAll('.prompt-card').forEach(card => {
-            card.classList.toggle('focus-active', card.dataset.id === p.id);
-        });
-    }
-
-    function resetFocus() {
-        selectedFocus = null;
-        document.getElementById('focus-area').classList.add('hidden');
-        document.querySelectorAll('.prompt-card').forEach(card => {
-            card.classList.remove('focus-active', 'secondary-card');
-        });
-    }
-
-function applyJoker() {
-    const tipTitleEl = document.getElementById('tip-3-title');
-    const tipTextEl = document.getElementById('tip-3-text');
-    
-    // Wir nutzen den Default-Wert aus deiner tips.json oder setzen ihn direkt
-    const fallback = categoryTips["default"] || "Aktion: Was ist der winzigste nächste Schritt, der heute möglich ist?";
-    
-    if (fallback.includes(':')) {
-        const [title, desc] = fallback.split(':');
-        tipTitleEl.textContent = title.trim();
-        tipTextEl.textContent = desc.trim();
-    } else {
-        tipTitleEl.textContent = "Aktion";
-        tipTextEl.textContent = fallback;
-    }
-}
-      
-    function drawThree() {
-        resetFocus();
-        const container = document.getElementById('triple-container');
-        container.innerHTML = '';
-        const selection = shuffle(prompts).slice(0, 3);
-        
-        selection.forEach((p, i) => {
-            const card = document.createElement('div');
-            card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
-            card.dataset.id = p.id;
-            card.style.animationDelay = `${i * 150}ms`;
-            card.onclick = () => setFocus(p);
-            card.innerHTML = `
-                <div class="w-full">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-[10px] font-mono text-gray-400">${p.id}</span>
-                        <span class="text-[10px] font-bold text-accent uppercase tracking-widest">${p.cat}</span>
-                    </div>
-                    <p class="text-lg font-serif text-ink leading-snug">"${p.text}"</p>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function renderLibrary() {
-        const grid = document.getElementById('library-grid');
-        grid.innerHTML = '';
-        const filtered = activeFilter === 'Alle' ? prompts : prompts.filter(p => p.cat === activeFilter);
-        filtered.forEach(p => {
-            const item = document.createElement('div');
-            item.className = "bg-white p-5 rounded-xl border border-warmBorder hover:border-accent cursor-pointer transition-all";
-            item.onclick = () => { setFocus(p); };
-            item.innerHTML = `
-                <div class="flex justify-between mb-2"><span class="text-[9px] font-mono">${p.id}</span><span class="text-[9px] uppercase text-accent font-bold">${p.cat}</span></div>
-                <p class="text-sm font-serif italic text-ink">"${p.text}"</p>
-            `;
-            grid.appendChild(item);
-        });
-    }
-
-    function renderFilters() {
-        const bar = document.getElementById('cat-filters');
-        const uniqueCats = [...new Set(prompts.map(p => p.cat))].sort((a, b) => a.localeCompare('de'));
-        const cats = ['Alle', ...uniqueCats];
-        bar.innerHTML = '';
-        cats.forEach(c => {
-            const btn = document.createElement('button');
-            btn.textContent = c;
-            btn.className = `px-3 py-1 rounded-full text-[10px] border transition-all ${activeFilter === c ? 'bg-ink text-white' : 'bg-white text-gray-400 border-warmBorder hover:border-accent'}`;
-            btn.onclick = () => { 
-                activeFilter = c; 
+        async function loadPrompts() {
+            try {
+                const [promptsRes, tipsRes] = await Promise.all([
+                    fetch('prompts.json'),
+                    fetch('tips.json')
+                ]);
+                prompts = await promptsRes.json();
+                categoryTips = await tipsRes.json();
                 renderFilters(); 
-                renderLibrary(); 
-            };
-            bar.appendChild(btn);
-        });
-    }
+                renderLibrary();
+                drawThree();
+                document.getElementById('prompt-count').textContent = prompts.length;
+            } catch (error) {
+                console.error("Fehler beim Laden:", error);
+            }
+        }
 
-    document.getElementById('btn-draw').onclick = drawThree;
-    window.onload = loadPrompts;
-</script>
-</body>
-</html>
+        function shuffle(array) { return [...array].sort(() => Math.random() - 0.5); }
+
+        function setFocus(p) {
+            selectedFocus = p;
+            const focusArea = document.getElementById('focus-area');
+            document.getElementById('focus-id').textContent = p.id;
+            document.getElementById('focus-title').textContent = `"${p.text}"`;
+            const tipTitleEl = document.getElementById('tip-3-title');
+            const tipTextEl = document.getElementById('tip-3-text');
+            const fullTip = categoryTips[p.cat] || categoryTips["default"];
+            if (fullTip.includes(':')) {
+                const [title, desc] = fullTip.split(':');
+                tipTitleEl.textContent = title.trim();
+                tipTextEl.textContent = desc.trim();
+            } else {
+                tipTitleEl.textContent = "Aktion";
+                tipTextEl.textContent = fullTip;
+            }
+            focusArea.classList.remove('hidden');
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                card.classList.toggle('focus-active', card.dataset.id === p.id);
+            });
+        }
+
+        function resetFocus() {
+            selectedFocus = null;
+            document.getElementById('focus-area').classList.add('hidden');
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                card.classList.remove('focus-active', 'secondary-card');
+            });
+        }
+
+        function applyJoker() {
+            const tipTitleEl = document.getElementById('tip-3-title');
+            const tipTextEl = document.getElementById('tip-3-text');
+            const fallback = categoryTips["default"] || "Aktion: Was ist der winzigste nächste Schritt, der heute möglich ist?";
+            if (fallback.includes(':')) {
+                const [title, desc] = fallback.split(':');
+                tipTitleEl.textContent = title.trim();
+                tipTextEl.textContent = desc.trim();
+            } else {
+                tipTitleEl.textContent = "Aktion";
+                tipTextEl.textContent = fallback;
+            }
+        }
+
+        function drawThree() {
+            resetFocus();
+            const container = document.getElementById('triple-container');
+            container.innerHTML = '';
+            const selection = shuffle(prompts).slice(0, 3);
+            selection.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
+                card.dataset.id = p.id;
+                card.style.animationDelay = `${i * 150}ms`;
+                card.onclick = () => setFocus(p);
+                card.innerHTML = `
+                    <div class="w-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-mono text-gray-400">${p.id}</span>
+                            <span class="text-[10px] font-bold text-accent uppercase tracking-widest">${p.cat}</span>
+                        </div>
+                        <p class="text-lg font-serif text-ink leading-snug">"${p.text}"</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('library-grid');
+            grid.innerHTML = '';
+            const filtered = activeFilter === 'Alle' ? prompts : prompts.filter(p => p.cat === activeFilter);
+            filtered.forEach(p => {
+                const item = document.createElement('div');
+                item.className = "bg-white p-5 rounded-xl border border-warmBorder hover:border-accent cursor-pointer transition-all";
+                item.onclick = () => { setFocus(p); };
+                item.innerHTML = `
+                    <div class="flex justify-between mb-2"><span class="text-[9px] font-mono">${p.id}</span><span class="text-[9px] uppercase text-accent font-bold">${p.cat}</span></div>
+                    <p class="text-sm font-serif italic text-ink">"${p.text}"</p>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function renderFilters() {
+            const bar = document.getElementById('cat-filters');
+            const uniqueCats = [...new Set(prompts.map(p => p.cat))].sort((a, b) => a.localeCompare('de'));
+            const cats = ['Alle', ...uniqueCats];
+            bar.innerHTML = '';
+            cats.forEach(c => {
+                const btn = document.createElement('button');
+                btn.textContent = c;
+                btn.className = `px-3 py-1 rounded-full text-[10px] border transition-all ${activeFilter === c ? 'bg-ink text-white' : 'bg-white text-gray-400 border-warmBorder hover:border-accent'}`;
+                btn.onclick = () => { 
+                    activeFilter = c; 
+                    renderFilters(); 
+                    renderLibrary(); 
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        document.getElementById('btn-draw').onclick = drawThree;
+        window.onload = loadPrompts;
+    </script
