@@ -205,6 +205,23 @@
         });
     }
 
+function applyJoker() {
+    const tipTitleEl = document.getElementById('tip-3-title');
+    const tipTextEl = document.getElementById('tip-3-text');
+    
+    // Wir nutzen den Default-Wert aus deiner tips.json oder setzen ihn direkt
+    const fallback = categoryTips["default"] || "Aktion: Was ist der winzigste nächste Schritt, der heute möglich ist?";
+    
+    if (fallback.includes(':')) {
+        const [title, desc] = fallback.split(':');
+        tipTitleEl.textContent = title.trim();
+        tipTextEl.textContent = desc.trim();
+    } else {
+        tipTitleEl.textContent = "Aktion";
+        tipTextEl.textContent = fallback;
+    }
+}
+      
     function drawThree() {
         resetFocus();
         const container = document.getElementById('triple-container');
