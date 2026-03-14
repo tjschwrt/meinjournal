@@ -134,121 +134,134 @@
         </section>
     </main>
 
-    <script>
-        let prompts = []; 
-        let selectedFocus = null;
-        let activeFilter = 'Alle';
+  <script>
+    let prompts = []; 
+    let categoryTips = {}; // NEU: Speicher für die Tipps aus der JSON
+    let selectedFocus = null;
+    let activeFilter = 'Alle';
 
-        async function loadPrompts() {
-            try {
-                const response = await fetch('prompts.json');
-                prompts = await response.json();
-                
-                renderFilters(); 
-                renderLibrary();
-                drawThree();
-                
-                document.getElementById('prompt-count').textContent = prompts.length;
-            } catch (error) {
-                console.error("Fehler beim Laden:", error);
-                // Falls die Datei lokal nicht geladen werden kann (CORS), 
-                // wird hier eine Fehlermeldung angezeigt.
-            }
-        }
-
-        function shuffle(array) { return [...array].sort(() => Math.random() - 0.5); }
-
-        function setFocus(p) {
-            selectedFocus = p;
-            const focusArea = document.getElementById('focus-area');
-            document.getElementById('focus-id').textContent = p.id;
-            document.getElementById('focus-title').textContent = `"${p.text}"`;
-            focusArea.classList.remove('hidden');
+    async function loadPrompts() {
+        try {
+            // NEU: Lädt beide Dateien gleichzeitig
+            const [promptsRes, tipsRes] = await Promise.all([
+                fetch('prompts.json'),
+                fetch('tips.json')
+            ]);
             
-            document.querySelectorAll('.prompt-card').forEach(card => {
-                card.classList.toggle('focus-active', card.dataset.id === p.id);
-                card.classList.toggle('secondary-card', card.dataset.id !== p.id);
-            });
-
-        }
-
-        function resetFocus() {
-            selectedFocus = null;
-            document.getElementById('focus-area').classList.add('hidden');
-            document.querySelectorAll('.prompt-card').forEach(card => {
-                card.classList.remove('focus-active', 'secondary-card');
-            });
-        }
-
-        function drawThree() {
-            resetFocus();
-            const container = document.getElementById('triple-container');
-            container.innerHTML = '';
-            const selection = shuffle(prompts).slice(0, 3);
+            prompts = await promptsRes.json();
+            categoryTips = await tipsRes.json();
             
-            selection.forEach((p, i) => {
-                const card = document.createElement('div');
-                card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
-                card.dataset.id = p.id;
-                card.style.animationDelay = `${i * 150}ms`;
-                card.onclick = () => setFocus(p);
-                card.innerHTML = `
-                    <div class="w-full">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-[10px] font-mono text-gray-400">${p.id}</span>
-                            <span class="text-[10px] font-bold text-accent uppercase tracking-widest">${p.cat}</span>
-                        </div>
-                        <p class="text-lg font-serif text-ink leading-snug">"${p.text}"</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function renderLibrary() {
-            const grid = document.getElementById('library-grid');
-            grid.innerHTML = '';
-            const filtered = activeFilter === 'Alle' ? prompts : prompts.filter(p => p.cat === activeFilter);
-            filtered.forEach(p => {
-                const item = document.createElement('div');
-                item.className = "bg-white p-5 rounded-xl border border-warmBorder hover:border-accent cursor-pointer transition-all";
-                item.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); setFocus(p); };
-                item.innerHTML = `
-                    <div class="flex justify-between mb-2"><span class="text-[9px] font-mono">${p.id}</span><span class="text-[9px] uppercase text-accent font-bold">${p.cat}</span></div>
-                    <p class="text-sm font-serif italic text-ink">"${p.text}"</p>
-                `;
-                grid.appendChild(item);
-            });
-        }
-
-function renderFilters() {
-            const bar = document.getElementById('cat-filters');
+            renderFilters(); 
+            renderLibrary();
+            drawThree();
             
-            // 1. Einzigartige Kategorien holen (alphabetisch sortiert)
-            const uniqueCats = [...new Set(prompts.map(p => p.cat))].sort((a, b) => a.localeCompare('de'));
-            
-            // 2. "Alle" explizit an den Anfang setzen
-            const cats = ['Alle', ...uniqueCats];
-
-            bar.innerHTML = '';
-            cats.forEach(c => {
-                const btn = document.createElement('button');
-                btn.textContent = c;
-                btn.className = `px-3 py-1 rounded-full text-[10px] border transition-all ${activeFilter === c ? 'bg-ink text-white' : 'bg-white text-gray-400 border-warmBorder hover:border-accent'}`;
-                btn.onclick = () => { 
-                    activeFilter = c; 
-                    renderFilters(); 
-                    renderLibrary(); 
-                };
-                bar.appendChild(btn);
-            });
+            document.getElementById('prompt-count').textContent = prompts.length;
+        } catch (error) {
+            console.error("Fehler beim Laden:", error);
         }
+    }
 
-        // Event Listener und Initialisierung
-        document.getElementById('btn-draw').onclick = drawThree;
+    function shuffle(array) { return [...array].sort(() => Math.random() - 0.5); }
+
+    function setFocus(p) {
+        selectedFocus = p;
+        const focusArea = document.getElementById('focus-area');
+        document.getElementById('focus-id').textContent = p.id;
+        document.getElementById('focus-title').textContent = `"${p.text}"`;
+
+        // NEU: Dynamischer Tipp für Punkt 3
+        const tipTitleEl = document.getElementById('tip-3-title');
+        const tipTextEl = document.getElementById('tip-3-text');
         
-        // Startet die App
-        loadPrompts();
-    </script>
+        // Holt den Tipp aus der JSON basierend auf p.cat
+        const fullTip = categoryTips[p.cat] || categoryTips["default"];
+        
+        // Trennung von "Titel: Beschreibung"
+        if (fullTip.includes(':')) {
+            const [title, desc] = fullTip.split(':');
+            tipTitleEl.textContent = title.trim();
+            tipTextEl.textContent = desc.trim();
+        } else {
+            tipTitleEl.textContent = "Aktion";
+            tipTextEl.textContent = fullTip;
+        }
+
+        focusArea.classList.remove('hidden');
+        
+        document.querySelectorAll('.prompt-card').forEach(card => {
+            card.classList.toggle('focus-active', card.dataset.id === p.id);
+        });
+    }
+
+    function resetFocus() {
+        selectedFocus = null;
+        document.getElementById('focus-area').classList.add('hidden');
+        document.querySelectorAll('.prompt-card').forEach(card => {
+            card.classList.remove('focus-active', 'secondary-card');
+        });
+    }
+
+    function drawThree() {
+        resetFocus();
+        const container = document.getElementById('triple-container');
+        container.innerHTML = '';
+        const selection = shuffle(prompts).slice(0, 3);
+        
+        selection.forEach((p, i) => {
+            const card = document.createElement('div');
+            card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
+            card.dataset.id = p.id;
+            card.style.animationDelay = `${i * 150}ms`;
+            card.onclick = () => setFocus(p);
+            card.innerHTML = `
+                <div class="w-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[10px] font-mono text-gray-400">${p.id}</span>
+                        <span class="text-[10px] font-bold text-accent uppercase tracking-widest">${p.cat}</span>
+                    </div>
+                    <p class="text-lg font-serif text-ink leading-snug">"${p.text}"</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function renderLibrary() {
+        const grid = document.getElementById('library-grid');
+        grid.innerHTML = '';
+        const filtered = activeFilter === 'Alle' ? prompts : prompts.filter(p => p.cat === activeFilter);
+        filtered.forEach(p => {
+            const item = document.createElement('div');
+            item.className = "bg-white p-5 rounded-xl border border-warmBorder hover:border-accent cursor-pointer transition-all";
+            item.onclick = () => { setFocus(p); };
+            item.innerHTML = `
+                <div class="flex justify-between mb-2"><span class="text-[9px] font-mono">${p.id}</span><span class="text-[9px] uppercase text-accent font-bold">${p.cat}</span></div>
+                <p class="text-sm font-serif italic text-ink">"${p.text}"</p>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    function renderFilters() {
+        const bar = document.getElementById('cat-filters');
+        const uniqueCats = [...new Set(prompts.map(p => p.cat))].sort((a, b) => a.localeCompare('de'));
+        const cats = ['Alle', ...uniqueCats];
+        bar.innerHTML = '';
+        cats.forEach(c => {
+            const btn = document.createElement('button');
+            btn.textContent = c;
+            btn.className = `px-3 py-1 rounded-full text-[10px] border transition-all ${activeFilter === c ? 'bg-ink text-white' : 'bg-white text-gray-400 border-warmBorder hover:border-accent'}`;
+            btn.onclick = () => { 
+                activeFilter = c; 
+                renderFilters(); 
+                renderLibrary(); 
+            };
+            bar.appendChild(btn);
+        });
+    }
+
+    document.getElementById('btn-draw').onclick = drawThree;
+    window.onload = loadPrompts;
+</script>
 </body>
 </html>
