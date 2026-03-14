@@ -147,26 +147,21 @@
             const tipTitleEl = document.getElementById('tip-3-title');
             const tipTextEl = document.getElementById('tip-3-text');
             const fullTip = categoryTips[p.cat] || categoryTips["default"];
-            if (fullTip.includes(':')) {
+            if (fullTip && fullTip.includes(':')) {
                 const [title, desc] = fullTip.split(':');
                 tipTitleEl.textContent = title.trim();
                 tipTextEl.textContent = desc.trim();
             } else {
                 tipTitleEl.textContent = "Aktion";
-                tipTextEl.textContent = fullTip;
+                tipTextEl.textContent = fullTip || "Was ist der winzigste nächste Schritt?";
             }
             focusArea.classList.remove('hidden');
-            document.querySelectorAll('.prompt-card').forEach(card => {
-                card.classList.toggle('focus-active', card.dataset.id === p.id);
-            });
+            window.scrollTo({ top: focusArea.offsetTop - 100, behavior: 'smooth' });
         }
 
         function resetFocus() {
             selectedFocus = null;
             document.getElementById('focus-area').classList.add('hidden');
-            document.querySelectorAll('.prompt-card').forEach(card => {
-                card.classList.remove('focus-active', 'secondary-card');
-            });
         }
 
         function applyJoker() {
@@ -190,9 +185,7 @@
             const selection = shuffle(prompts).slice(0, 3);
             selection.forEach((p, i) => {
                 const card = document.createElement('div');
-                card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left fade-in cursor-pointer hover:shadow-md transition-all";
-                card.dataset.id = p.id;
-                card.style.animationDelay = `${i * 150}ms`;
+                card.className = "prompt-card bg-white p-6 rounded-2xl border border-warmBorder shadow-sm flex flex-col justify-between items-start text-left cursor-pointer hover:shadow-md transition-all";
                 card.onclick = () => setFocus(p);
                 card.innerHTML = `
                     <div class="w-full">
@@ -243,4 +236,6 @@
 
         document.getElementById('btn-draw').onclick = drawThree;
         window.onload = loadPrompts;
-    </script
+    </script>
+</body>
+</html>
