@@ -161,14 +161,14 @@
   {"id": "V6", "cat": "Vision", "text": "Vision Karriere / Berufung: Wie würde eine „10 von 10“ dort aussehen?"},
   {"id": "V7", "cat": "Vision", "text": "Vision Finanzen: Wie würde eine „10 von 10“ dort aussehen?"},
   {"id": "V8", "cat": "Vision", "text": "Vision Lernen & Entwicklung: Wie würde eine „10 von 10“ dort aussehen?"},
-  {"id": "V9", "cat": "Vision", "text": "Vision Erlebnisse & Abenteuer: Wie würde eine „10 von 10“ dort aussehen?"}
+  {"id": "V9", "cat": "Vision", "text": "Vision Erlebnisse & Abenteuer: Wie würde eine „10 von 10“ dort aussehen?"},
   {"id": "LF1", "cat": "Leichtigkeit & Freude", "text": "Welches winzige Detail heute hat dich überrascht?"},
   {"id": "LF2", "cat": "Leichtigkeit & Freude", "text": "Was war heute unerwartet angenehm?"},
   {"id": "LF3", "cat": "Leichtigkeit & Freude", "text": "Worüber hast du heute gelacht?"},
   {"id": "LF4", "cat": "Leichtigkeit & Freude", "text": "Welcher Moment heute hat sich leicht angefühlt?"},
   {"id": "LF5", "cat": "Leichtigkeit & Freude", "text": "Welche absurde Kleinigkeit war heute schön?"},
   {"id": "LF6", "cat": "Leichtigkeit & Freude", "text": "Was hast du heute genossen, ohne darüber nachzudenken?"},
-  {"id": "LF7", "cat": "Leichtigkeit & Freude", "text": "Welche Kleinigkeit heute hat dich zum Schmunzeln gebracht?"}
+  {"id": "LF7", "cat": "Leichtigkeit & Freude", "text": "Welche Kleinigkeit heute hat dich zum Schmunzeln gebracht?"},
   {"id": "K1", "cat": "Körper & Embodiment", "text": "Wo im Körper spürst du gerade etwas? Beschreibe es ohne Namen für das Gefühl (z.B. eng, warm, schwer, kribbelig)."},
   {"id": "K2", "cat": "Körper & Embodiment", "text": "Welcher Körperbereich fühlt sich heute besonders an - angespannt, taub, lebendig, müde?"},
   {"id": "K3", "cat": "Körper & Embodiment", "text": "Wenn die stärkste Körperempfindung gerade sprechen könnte, was würde sie sagen?"},
